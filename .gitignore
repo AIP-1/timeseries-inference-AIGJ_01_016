@@ -1,0 +1,32 @@
+# Secrets / local config
+.env
+config.yaml
+config.chirpstack.yaml
+!config.example.yaml
+
+# SQLite spool
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+
+# Generated reports
+coverage_*.md
+coverage_report_final.md
+**/reports/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Exported data / logs
+*.csv
+*.log
+*.csv.gz
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

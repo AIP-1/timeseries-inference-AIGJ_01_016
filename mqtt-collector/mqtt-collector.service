@@ -1,0 +1,26 @@
+[Unit]
+Description=MQTT -> InfluxDB sensor collector
+Wants=network-online.target
+After=network-online.target time-sync.target
+# 설치 폴더가 있는 디스크가 마운트된 뒤에 시작 (install.sh 가 __APP__ 를 실제 경로로 바꿈)
+RequiresMountsFor=__APP__
+# VPN 을 통해서만 브로커/Influx 에 닿는다면 VPN 서비스 이름을 추가 (예: openvpn-client@xxx.service, wg-quick@wg0.service)
+# After=wg-quick@wg0.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=__USER__
+WorkingDirectory=__APP__
+EnvironmentFile=/etc/mqtt-collector/env
+Environment=PYTHONUNBUFFERED=1
+# 젯슨 나노는 RTC 배터리가 없으면 부팅 직후 시계가 틀릴 수 있다 → NTP 동기화를 최대 2분 기다린 뒤 시작
+ExecStartPre=/bin/sh -c 'for i in $$(seq 60); do timedatectl | grep -q "synchronized: yes" && exit 0; sleep 2; done; exit 0'
+ExecStart=__APP__/venv/bin/python collector.py --config __APP__/config.yaml
+Restart=always
+RestartSec=5
+TimeoutStopSec=20
+TimeoutStartSec=180
+
+[Install]
+WantedBy=multi-user.target
